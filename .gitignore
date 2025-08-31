@@ -1,4 +1,4 @@
-gitignore# Python
+# Python
 *.pyc
 __pycache__/
 *.pyo
