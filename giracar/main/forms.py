@@ -4,15 +4,14 @@ from .models import CarRequest
 class CarRequestForm(forms.ModelForm):
     class Meta:
         model = CarRequest
-        fields = ['name', 'make', 'model', 'year', 'total_price', 'monthly_payment', 'details', 'contact']
+        fields = ['name', 'make', 'model', 'year', 'details', 'local', 'contact']
         labels = {
             'name': 'Nome',
             'make': 'Marca do carro',
             'model': 'Modelo do carro',
             'year': 'Ano de fabricação',
-            'total_price': 'Preço total (R$)',
-            'monthly_payment': 'Quanto posso pagar por mês (R$)',
             'details': 'Detalhes adicionais',
+            'local': 'Cidade onde procura',
             'contact': 'Contato (email ou telefone)',
         }
         widgets = {
@@ -20,8 +19,17 @@ class CarRequestForm(forms.ModelForm):
             'make': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'model': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'year': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
-            'total_price': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2 currency'}),
-            'monthly_payment': forms.NumberInput(attrs={'class': 'w-full border rounded px-3 py-2 currency'}),
-            'details': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2', 'rows':4}),
+            'details': forms.Textarea(attrs={'class': 'w-full border rounded px-3 py-2', 'rows': 4}),
+            'local': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
             'contact': forms.TextInput(attrs={'class': 'w-full border rounded px-3 py-2'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in self.fields:
+            if field == 'contact':
+                continue 
+            value = cleaned_data.get(field)
+            if isinstance(value, str):  # Only format strings
+                cleaned_data[field] = value.strip().capitalize()
+        return cleaned_data

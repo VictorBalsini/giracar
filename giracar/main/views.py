@@ -29,28 +29,28 @@ def dashboard(request):
     # Filters
     make_filter = request.GET.get('make')
     model_filter = request.GET.get('model')
-    year_filter = request.GET.get('year')
+    local_filter = request.GET.get('local')
 
     if make_filter:
         cars = cars.filter(make__icontains=make_filter)
     if model_filter:
         cars = cars.filter(model__icontains=model_filter)
-    if year_filter:
-        cars = cars.filter(year=year_filter)
+    if local_filter:
+        cars = cars.filter(local=local_filter)
 
     # Unique values for dropdowns
     makes = CarRequest.objects.values_list('make', flat=True).distinct().order_by('make')
     models = CarRequest.objects.values_list('model', flat=True).distinct().order_by('model')
-    years = CarRequest.objects.values_list('year', flat=True).distinct().order_by('year')
+    locals = CarRequest.objects.values_list('local', flat=True).distinct().order_by('local')
 
     context = {
         'cars': cars,
         'makes': makes,
         'models': models,
-        'years': years,
+        'locals': locals,
         'selected_make': make_filter,
         'selected_model': model_filter,
-        'selected_year': year_filter,
+        'selected_local': local_filter,
     }
     return render(request, 'dashboard.html', context)
 

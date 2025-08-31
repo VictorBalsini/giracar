@@ -8,87 +8,63 @@
         <p class="text-gray-600">Visualize e filtre os carros cadastrados.</p>
     </div>
 
-    <!-- Filters aligned with table -->
-    <div class="max-w-7xl mx-auto mb-6">
-        <form method="GET" class="flex flex-wrap gap-4">
-            <select name="make" class="border rounded px-3 py-2">
+    <!-- Filters -->
+    <div class="max-w-7xl mx-auto mb-8">
+        <form method="GET" class="flex flex-wrap gap-4 items-center">
+            <select name="make" class="border rounded px-3 py-2 shadow-sm focus:ring-1 focus:ring-blue-400">
                 <option value="">Todas as marcas</option>
                 {% for make in makes %}
                 <option value="{{ make }}" {% if make == selected_make %}selected{% endif %}>{{ make }}</option>
                 {% endfor %}
             </select>
 
-            <select name="model" class="border rounded px-3 py-2">
+            <select name="model" class="border rounded px-3 py-2 shadow-sm focus:ring-1 focus:ring-blue-400">
                 <option value="">Todos os modelos</option>
                 {% for model in models %}
                 <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>{{ model }}</option>
                 {% endfor %}
             </select>
 
-            <select name="year" class="border rounded px-3 py-2">
-                <option value="">Todos os anos</option>
-                {% for year in years %}
-                <option value="{{ year }}" {% if year|stringformat:"s" == selected_year %}selected{% endif %}>{{ year }}</option>
+            <select name="local" class="border rounded px-3 py-2 shadow-sm focus:ring-1 focus:ring-blue-400">
+                <option value="">Todas as cidades</option>
+                {% for local in locals %}
+                <option value="{{ local }}" {% if local|stringformat:"s" == selected_local %}selected{% endif %}>{{ local }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Filtrar</button>
-            <a href="{% url 'dashboard' %}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Resetar</a>
+            <button type="submit" class="px-5 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">Filtrar</button>
+            <a href="{% url 'dashboard' %}" class="px-5 py-2 bg-gray-300 text-gray-700 rounded-lg shadow hover:bg-gray-400 transition">Resetar</a>
         </form>
     </div>
 
-    <!-- Table / Cards -->
-    <div class="max-w-7xl mx-auto overflow-x-auto shadow-xl rounded-2xl bg-white border border-gray-200">
-        <!-- Table for medium+ screens -->
-        <table class="min-w-full divide-y divide-gray-200 table-auto hidden md:table">
-            <thead class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                <tr>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Cliente</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Marca</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Modelo</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Ano</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Preço Total</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Pagamento/Mês</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase">Detalhes</th>
-                    <th class="px-4 py-3 text-left text-sm font-semibold uppercase whitespace-nowrap">Contato</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for car in cars %}
-                <tr class="hover:bg-blue-50 transition duration-200">
-                    <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{{ car.name }}</td>
-                    <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{{ car.make }}</td>
-                    <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ car.model }}</td>
-                    <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ car.year }}</td>
-                    <td class="px-4 py-3 font-semibold text-green-600 whitespace-nowrap">{{ car.total_price_brl }}</td>
-                    <td class="px-4 py-3 font-semibold text-yellow-600 whitespace-nowrap">{{ car.monthly_payment_brl }}</td>
-                    <td class="px-4 py-3 text-gray-700">{{ car.details }}</td>
-                    <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ car.contact }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Cards Container -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for car in cars %}
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl transition duration-300">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
+                <h2 class="text-xl font-bold text-white">Cliente: {{ car.name }}</h2>
+                <p class="text-md text-blue-100">{{ car.local }}</p>
+            </div>
 
-        <!-- Card view for small screens -->
-        <div class="md:hidden space-y-4 p-4">
-            {% for car in cars %}
-            <div class="bg-white border border-gray-200 rounded-lg shadow p-4">
-                <div class="flex justify-between mb-2">
-                    <span class="font-semibold text-gray-800">{{ car.name }}</span>
-                    <span class="font-semibold text-gray-800">{{ car.make }} - {{ car.model }}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                    <div><span class="font-semibold">Ano:</span> {{ car.year }}</div>
-                    <div><span class="font-semibold">Preço Total:</span> {{ car.total_price_brl }}</div>
-                    <div><span class="font-semibold">Pagamento/Mês:</span> {{ car.monthly_payment_brl }}</div>
-                    <div><span class="font-semibold">Contato:</span> {{ car.contact }}</div>
-                    <div class="col-span-2"><span class="font-semibold">Detalhes:</span> {{ car.details }}</div>
+            <!-- Body -->
+            <div class="p-4 space-y-4">
+                <!-- Make, Model, Year -->
+                <p class="text-lg font-bold text-gray-800">
+                    {{ car.make }} {{ car.model }} - {{ car.year }}
+                </p>
+
+                <!-- Details -->
+                <div>
+                    <p class="font-semibold text-gray-800 mb-1">Detalhes:</p>
+                    <p class="text-gray-700">{{ car.details }}</p>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
 
+    <!-- No Cars Message -->
     {% if not cars %}
     <div class="text-center py-16">
         <svg class="mx-auto h-20 w-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
