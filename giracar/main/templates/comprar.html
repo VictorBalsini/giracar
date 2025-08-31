@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Quero Comprar{% endblock %}
+
+{% block content %}
+<!-- Full page gradient wrapper -->
+<div class="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-gray-50 flex justify-center items-start py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Form card -->
+    <div class="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-8">
+        <!-- Header -->
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">Formulário de Compra</h1>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for message in messages %}
+            <div class="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium shadow">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-gray-700 font-medium mb-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ field.errors }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="flex justify-center mt-6">
+                <button type="submit" 
+                        class="px-6 py-3 bg-green-500 text-white font-semibold rounded-xl shadow hover:bg-green-600 transition transform hover:scale-105">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Página Inicial{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+
+  <!-- Company logo -->
+  <img src="{% static 'images/logo.png' %}" alt="Bus.Car Logo" class="w-48 mb-6">
+
+  <!-- Welcome text -->
+  <h1 class="text-3xl font-bold mb-12 text-center">Bem-vindo ao Bus.Car</h1>
+
+  <!-- Buttons -->
+  <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+
+    <!-- Quero Comprar -->
+    <a href="{% url 'comprar' %}" class="flex flex-col items-center">
+      <img src="{% static 'images/quero_comprar.png' %}"
+           class="w-40 h-24 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200"
+           alt="Quero Comprar">
+      <span class="mt-2 text-lg font-semibold text-gray-700">Quero Comprar</span>
+    </a>
+
+    <!-- Quero Vender -->
+    <a href="{% url 'dashboard' %}" class="flex flex-col items-center">
+      <img src="{% static 'images/quero_vender.png' %}"
+           class="w-40 h-24 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200"
+           alt="Quero Vender">
+      <span class="mt-2 text-lg font-semibold text-gray-700">Quero Vender</span>
+    </a>
+
+  </div>
+</div>
+{% endblock %}

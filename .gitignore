@@ -1,0 +1,25 @@
+gitignore# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.env
+
+# Django
+*.sqlite3
+/staticfiles/
+media/
+*.log
+
+# Node / Tailwind
+node_modules/
+tailwind.config.js
+package-lock.json
+npm-debug.log
+
+# IDEs
+.vscode/
+.idea/

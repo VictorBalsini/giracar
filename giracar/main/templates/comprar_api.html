@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}Quero Comprar{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-6">Formulário de Compra</h1>
+
+<form class="space-y-4 max-w-lg" id="carForm">
+    <!-- Make -->
+    <div>
+        <label for="make" class="block font-medium mb-1">Marca</label>
+        <select id="make" name="make" class="w-full border rounded px-3 py-2">
+            <option value="">Selecione a marca</option>
+        </select>
+    </div>
+
+    <!-- Model -->
+    <div>
+        <label for="model" class="block font-medium mb-1">Modelo</label>
+        <select id="model" name="model" class="w-full border rounded px-3 py-2" disabled>
+            <option value="">Selecione o modelo</option>
+        </select>
+    </div>
+
+    <!-- Year -->
+    <div>
+        <label for="year" class="block font-medium mb-1">Ano</label>
+        <select id="year" class="w-full border rounded px-3 py-2" disabled>
+            <option value="">-- Selecione o ano --</option>
+        </select>
+    </div>
+
+    <!-- Trim / Submodel -->
+    <div>
+        <label for="trim" class="block font-medium mb-1">Submodelo / Versão</label>
+        <select id="trim" class="w-full border rounded px-3 py-2" disabled>
+            <option value="">-- Selecione o submodelo --</option>
+        </select>
+    </div>
+
+    <!-- Total Price -->
+    <div>
+        <label for="total_price" class="block font-medium mb-1">Preço Total (R$)</label>
+        <input type="number" id="total_price" name="total_price"
+               class="w-full border rounded px-3 py-2" placeholder="50000">
+    </div>
+
+    <!-- Monthly Payment -->
+    <div>
+        <label for="monthly_payment" class="block font-medium mb-1">Quanto posso pagar por mês (R$)</label>
+        <input type="number" id="monthly_payment" name="monthly_payment"
+               class="w-full border rounded px-3 py-2" placeholder="1500">
+    </div>
+
+    <!-- Details -->
+    <div>
+        <label for="details" class="block font-medium mb-1">Detalhes adicionais</label>
+        <textarea id="details" name="details"
+                  class="w-full border rounded px-3 py-2"
+                  placeholder="Cor, câmbio, quilometragem..."></textarea>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex gap-4 mt-4">
+        <button type="submit"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+            Enviar
+        </button>
+        <a href="{% url 'index' %}"
+           class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+            Voltar
+        </a>
+    </div>
+</form>
+
+<script>
+const makeDropdown = document.getElementById('make');
+const modelDropdown = document.getElementById('model');
+const yearDropdown = document.getElementById('year');
+const trimDropdown = document.getElementById('trim');
+
+// Helper to reset trim
+function resetTrim() {
+    trimDropdown.innerHTML = '<option value="">-- Selecione o submodelo --</option>';
+    trimDropdown.disabled = true;
+}
+
+// -------------------------------
+// 1️⃣ Load all non-US Makes
+// -------------------------------
+function carMakesCallback(data) {
+    (data.Makes || []).forEach(make => {
+        const option = document.createElement('option');
+        option.value = make.make_id;
+        option.textContent = make.make_display;
+        makeDropdown.appendChild(option);
+    });
+}
+
+const scriptMakes = document.createElement('script');
+scriptMakes.src = 'https://www.carqueryapi.com/api/0.3/?cmd=getMakes&sold_in_us=0&callback=carMakesCallback';
+document.body.appendChild(scriptMakes);
+
+// -------------------------------
+// 2️⃣ Load Models when Make changes
+// -------------------------------
+makeDropdown.addEventListener('change', function() {
+    const make = this.value;
+    modelDropdown.innerHTML = '<option value="">-- Selecione o modelo --</option>';
+    yearDropdown.innerHTML = '<option value="">-- Selecione o ano --</option>';
+    resetTrim();
+    modelDropdown.disabled = true;
+    yearDropdown.disabled = true;
+
+    if (!make) return;
+    modelDropdown.disabled = false;
+
+    window.carModelsCallback = function(data) {
+        (data.Models || []).forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.model_name;
+            option.textContent = model.model_name;
+            modelDropdown.appendChild(option);
+        });
+    };
+
+    const scriptModels = document.createElement('script');
+    scriptModels.src = `https://www.carqueryapi.com/api/0.3/?cmd=getModels&make=${make}&sold_in_us=0&callback=carModelsCallback`;
+    document.body.appendChild(scriptModels);
+});
+
+// -------------------------------
+// 3️⃣ Load Years when Model changes
+// -------------------------------
+modelDropdown.addEventListener('change', function() {
+    const make = makeDropdown.value;
+    const model = this.value;
+    yearDropdown.innerHTML = '<option value="">-- Selecione o ano --</option>';
+    resetTrim();
+    yearDropdown.disabled = true;
+    if (!make || !model) return;
+    yearDropdown.disabled = false;
+
+    window.carTrimsCallback = function(data) {
+        const years = new Set();
+        (data.Trims || []).forEach(trim => {
+            if (trim.model_year) years.add(trim.model_year);
+        });
+        Array.from(years).sort((a,b) => b-a).forEach(year => {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearDropdown.appendChild(option);
+        });
+    };
+
+    const scriptTrims = document.createElement('script');
+    scriptTrims.src = `https://www.carqueryapi.com/api/0.3/?cmd=getTrims&make=${make}&model=${model}&sold_in_us=0&callback=carTrimsCallback`;
+    document.body.appendChild(scriptTrims);
+});
+
+// -------------------------------
+// 4️⃣ Load Trims/Submodels when Year changes
+// -------------------------------
+yearDropdown.addEventListener('change', function() {
+    const make = makeDropdown.value;
+    const model = modelDropdown.value;
+    const year = this.value;
+    resetTrim();
+    if (!make || !model || !year) return;
+
+    trimDropdown.disabled = false;
+
+    window.carTrimOptionsCallback = function(data) {
+        const trims = (data.Trims || []);
+        trims.forEach(trim => {
+            const option = document.createElement('option');
+            option.value = trim.model_trim;
+            option.textContent = trim.model_trim ;
+            trimDropdown.appendChild(option);
+        });
+    };
+
+    const scriptTrimOptions = document.createElement('script');
+    scriptTrimOptions.src = `https://www.carqueryapi.com/api/0.3/?cmd=getTrims&make=${make}&model=${model}&sold_in_us=0&callback=carTrimOptionsCallback`;
+    document.body.appendChild(scriptTrimOptions);
+});
+</script>
+{% endblock %}
